@@ -98,7 +98,7 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
   function store(v){try{localStorage.setItem("dictation",v)}catch(e){}}
   function load(){try{return localStorage.getItem("dictation")||""}catch(e){return ""}}
   t.value=load();
-  t.addEventListener("input",function(){store(t.value)});
+  t.addEventListener("input",function(){store(t.value);rebase()});
 
   function setDir(){t.dir=$("lang").value==="fa-IR"?"rtl":"ltr"}
   $("lang").addEventListener("change",function(){setDir();if(on){stop();say("زبان عوض شد. دوباره ضبط را شروع کنید.")}});
@@ -138,22 +138,46 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
   document.addEventListener("visibilitychange",function(){if(on&&document.visibilityState==="visible")lock()});
   function ui(){var m=$("mic");m.setAttribute("aria-pressed",on?"true":"false");m.textContent=on?"توقف":"شروع ضبط"}
 
-  var silT=null,lastActivity=0,started=false;
+  var silT=null,lastActivity=0,started=false,base="",sesFin=[],tail="",skip=0;
+  function norm1(s){return nw(String(s)).replace(/\s+/g," ").trim()}
+  function merge(arr){
+    var out=[];
+    arr.forEach(function(s){
+      var n=norm1(s);if(!n)return;
+      var l=out.length?norm1(out[out.length-1]):"";
+      if(l&&n.indexOf(l)===0){out[out.length-1]=s}
+      else if(l&&l.indexOf(n)===0){}
+      else out.push(s);
+    });
+    return out.join(" ");
+  }
+  function joinBase(b,add){
+    if(!add.trim())return b;
+    var sep=(!b||/[\s(«]$/.test(b)||/^[,.;:!?،؛؟…)»\n]/.test(add))?"":" ";
+    return b+sep+add;
+  }
+  function render(){
+    t.value=joinBase(base,conv(merge(sesFin)));
+    store(t.value);t.scrollTop=t.scrollHeight;
+    $("interim").textContent=tail||"در حال گوش دادن…";
+  }
+  function rebase(){if(on){skip+=sesFin.length;sesFin=[];base=t.value}}
   function mk(){
+    base=t.value;sesFin=[];tail="";skip=0;
     var r=new SR();r.lang=$("lang").value;r.continuous=true;r.interimResults=true;
     r.onstart=function(){started=true;say("میکروفون روشن است؛ بخوانید.")};
     r.onspeechstart=function(){lastActivity=Date.now()};
     r.onresult=function(e){
-      var interim="";fails=0;lastActivity=Date.now();
-      for(var i=e.resultIndex;i<e.results.length;i++){
-        var q=e.results[i],s=q[0].transcript;
-        if(q.isFinal){
-          var now=Date.now();
-          if(s.trim()&&!(s===lastFinal&&now-lastFinalAt<2000))append(conv(s));
-          lastFinal=s;lastFinalAt=now;
-        }else interim+=s;
+      if(r!==rec)return;
+      fails=0;lastActivity=Date.now();
+      var fin=[],ia=[];
+      for(var i=0;i<e.results.length;i++){
+        var q=e.results[i];
+        if(q.isFinal)fin.push(q[0].transcript);else ia.push(q[0].transcript);
       }
-      lastInterim=interim;
+      sesFin=fin.slice(skip);tail=merge(ia);lastInterim=tail;
+      var interim=tail;
+      render();
       $("interim").textContent=interim||"در حال گوش دادن…";
     };
     r.onerror=function(e){
@@ -166,7 +190,7 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
     };
     r.onend=function(){
       if(r!==rec)return;
-      if(lastInterim){append(conv(lastInterim));lastInterim=""}
+      if(tail.trim()){sesFin.push(tail);tail="";lastInterim="";render()}
       if(!on){$("interim").textContent="";ui();return}
       if(Date.now()-startedAt<800)fails++;
       if(fails>=10){stop();say("تشخیص صدا پیوسته قطع می‌شود. دوباره ضبط را شروع کنید یا از میکروفون کیبورد گوشی استفاده کنید.");return}
@@ -203,7 +227,7 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
     var b=e.target.closest("[data-i]");if(!b)return;
     var s=b.getAttribute("data-i"),a=t.selectionStart,z=t.selectionEnd;
     t.value=t.value.slice(0,a)+s+t.value.slice(z);
-    t.selectionStart=t.selectionEnd=a+s.length;store(t.value);
+    t.selectionStart=t.selectionEnd=a+s.length;store(t.value);rebase();
   });
 
   $("copy").addEventListener("click",function(){
@@ -213,9 +237,9 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
   });
   $("clear").addEventListener("click",function(){
     if(!t.value)return;
-    backup=t.value;t.value="";store("");$("undo").hidden=false;say("متن پاک شد.");
+    backup=t.value;t.value="";store("");rebase();$("undo").hidden=false;say("متن پاک شد.");
   });
-  $("undo").addEventListener("click",function(){t.value=backup;store(t.value);$("undo").hidden=true;say("متن برگردانده شد.")});
+  $("undo").addEventListener("click",function(){t.value=backup;store(t.value);rebase();$("undo").hidden=true;say("متن برگردانده شد.")});
 
   /* ---- Word (docx) file, built without any library ---- */
   var CT=(function(){var a=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;a[n]=c>>>0}return a})();
