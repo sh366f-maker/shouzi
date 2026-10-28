@@ -50,13 +50,6 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
           <option value="en-US">English</option>
         </select>
       </label>
-      <label>توقف خودکار بعد از سکوت
-        <select id="sil">
-          <option value="3" selected>۳ ثانیه</option>
-          <option value="10">۱۰ ثانیه</option>
-          <option value="0">هرگز</option>
-        </select>
-      </label>
     </div>
     <div class="row" aria-label="درج علامت">
       <button class="b" type="button" data-i="،">،</button>
@@ -192,9 +185,9 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
       if(r!==rec)return;
       if(tail.trim()){sesFin.push(tail);tail="";lastInterim="";render()}
       if(!on){$("interim").textContent="";ui();return}
-      if(Date.now()-startedAt<800)fails++;
-      if(fails>=10){stop();say("تشخیص صدا پیوسته قطع می‌شود. دوباره ضبط را شروع کنید یا از میکروفون کیبورد گوشی استفاده کنید.");return}
-      setTimeout(function(){go(0)},100);
+      if(Date.now()-startedAt<800)fails=Math.min(fails+1,20);else fails=0;
+      if(false){stop();say("تشخیص صدا پیوسته قطع می‌شود. دوباره ضبط را شروع کنید یا از میکروفون کیبورد گوشی استفاده کنید.");return}
+      setTimeout(function(){go(0)},Math.min(100+fails*150,1500));
     };
     return r;
   }
@@ -216,7 +209,7 @@ summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
     setTimeout(function(){if(on&&!started)say("میکروفون روشن نشد. اجازهٔ میکروفون را در تنظیمات مرورگر بررسی کنید یا صفحه را در Chrome باز کنید.")},4000);
     clearInterval(silT);
     silT=setInterval(function(){
-      var lim=+$("sil").value;
+      var lim=0;
       if(on&&lim>0&&Date.now()-lastActivity>lim*1000){stop();say("ضبط به‌دلیل "+lim+" ثانیه سکوت متوقف شد.")}
     },500);
   }
