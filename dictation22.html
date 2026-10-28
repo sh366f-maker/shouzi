@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تایپ با صدا</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f3f6fb;--surface:#fff;--ink:#14213d;--muted:#5b6785;--line:#d6deee;--accent:#1d4ed8;--accent-ink:#fff;--rec:#d92d20;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1424;--surface:#18203a;--ink:#e8ecf8;--muted:#9aa6c6;--line:#2c3760;--accent:#7aa2ff;--accent-ink:#0e1424;--rec:#ff6b5e}}
+:root[data-theme="dark"]{--bg:#0e1424;--surface:#18203a;--ink:#e8ecf8;--muted:#9aa6c6;--line:#2c3760;--accent:#7aa2ff;--accent-ink:#0e1424;--rec:#ff6b5e}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;line-height:1.8;font-size:16px}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:1.5rem;font-weight:800;margin:8px 0 4px}
+.sub{color:var(--muted);margin:0 0 16px;font-size:.92rem}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(20,33,61,.08)}
+.rec{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#mic{font:inherit;font-weight:800;font-size:1.05rem;min-height:64px;min-width:170px;border:0;border-radius:32px;background:var(--accent);color:var(--accent-ink);cursor:pointer;padding:0 28px}
+#mic[aria-pressed=true]{background:var(--rec);color:#fff;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(217,45,32,.18)}}
+@media (prefers-reduced-motion:reduce){#mic[aria-pressed=true]{animation:none}}
+select{font:inherit;min-height:46px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--bg);color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.b{font:inherit;font-weight:600;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 14px;cursor:pointer}
+.b.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.b:disabled{opacity:.55;cursor:default}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+textarea{font:inherit;font-size:1.05rem;line-height:2;width:100%;min-height:46vh;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg);color:var(--ink)}
+#interim{color:var(--muted);min-height:1.8em;font-size:.95rem}
+details{margin-top:10px;color:var(--muted);font-size:.9rem}
+summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#msg{color:var(--muted);font-size:.9rem;margin-top:8px;min-height:1.6em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>تایپ با صدا</h1>
+  <p class="sub">بخوانید تا متن نوشته شود، آن را ویرایش کنید و به‌صورت فایل Word ذخیره کنید.</p>
+
+  <div class="panel">
+    <div class="rec">
+      <button id="mic" type="button" aria-pressed="false">شروع ضبط</button>
+      <label>زبان
+        <select id="lang">
+          <option value="fa-IR">فارسی</option>
+          <option value="en-US">English</option>
+        </select>
+      </label>
+    </div>
+    <div class="row" aria-label="درج علامت">
+      <button class="b" type="button" data-i="،">،</button>
+      <button class="b" type="button" data-i=".">.</button>
+      <button class="b" type="button" data-i="؟">؟</button>
+      <button class="b" type="button" data-i=":">:</button>
+      <button class="b" type="button" data-i="؛">؛</button>
+      <button class="b" type="button" data-i="!">!</button>
+      <button class="b" type="button" data-i="…">…</button>
+      <button class="b" type="button" data-i="(">(</button>
+      <button class="b" type="button" data-i=")">)</button>
+      <button class="b" type="button" data-i="«">«</button>
+      <button class="b" type="button" data-i="»">»</button>
+      <button class="b" type="button" data-i="–">–</button>
+      <button class="b" type="button" data-i="&#10;">خط جدید</button>
+    </div>
+    <div id="msg" aria-live="polite"></div>
+    <details><summary>گفتن علائم با صدا</summary><p>هنگام خواندن می‌توانید بگویید: «ویرگول»، «نقطه»، «علامت سوال»، «علامت تعجب»، «دو نقطه»، «نقطه ویرگول»، «سه نقطه»، «پرانتز باز» و «پرانتز بسته»، «گیومه باز» و «گیومه بسته»، «خط تیره»، «خط جدید» یا «بند جدید». علامت در متن گذاشته می‌شود. اگر خودِ کلمهٔ «نقطه» را لازم داشتید، بعداً با کیبورد بنویسید.</p></details>
+  </div>
+
+  <div class="panel">
+    <textarea id="t" dir="rtl" placeholder="متن اینجا نوشته می‌شود. می‌توانید با کیبورد هم تایپ یا ویرایش کنید."></textarea>
+    <div id="interim" aria-live="off"></div>
+    <div class="row">
+      <button class="b main" id="save" type="button">ذخیره به‌صورت Word</button>
+      <button class="b" id="copy" type="button">کپی متن</button>
+      <button class="b" id="clear" type="button">پاک‌کردن</button>
+      <button class="b" id="undo" type="button" hidden>بازگردانی</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var t=$("t"),msgEl=$("msg"),on=false,rec=null,backup="",lastInterim="",lastFinal="",lastFinalAt=0,fails=0,startedAt=0,wl=null;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  function say(s){msgEl.textContent=s||""}
+  function store(v){try{localStorage.setItem("dictation",v)}catch(e){}}
+  function load(){try{return localStorage.getItem("dictation")||""}catch(e){return ""}}
+  t.value=load();
+  t.addEventListener("input",function(){store(t.value);rebase()});
+
+  function setDir(){t.dir=$("lang").value==="fa-IR"?"rtl":"ltr"}
+  $("lang").addEventListener("change",function(){setDir();if(on){stop();say("زبان عوض شد. دوباره ضبط را شروع کنید.")}});
+  setDir();
+
+  function append(s){
+    s=String(s||"");if(!s.trim())return;
+    var sep=(!t.value||/[\s(«]$/.test(t.value)||/^[,.;:!?،؛؟…)»\n]/.test(s))?"":" ";
+    t.value+=sep+s;
+    store(t.value);t.scrollTop=t.scrollHeight;
+  }
+  var CMD_FA=[["نقطه ویرگول","؛"],["دو نقطه",":"],["سه نقطه","…"],["علامت سوال","؟"],["علامت سؤال","؟"],["علامت تعجب","!"],["پرانتز باز","("],["پرانتز بسته",")"],["گیومه باز","«"],["گیومه بسته","»"],["خط تیره","–"],["خط جدید","\n"],["بند جدید","\n"],["ویرگول","،"],["نقطه","."]];
+  var CMD_EN=[["question mark","?"],["exclamation mark","!"],["exclamation point","!"],["semicolon",";"],["new line","\n"],["new paragraph","\n"],["full stop","."],["comma",","],["period","."],["colon",":"]];
+  function nw(w){return w.replace(/ي/g,"ی").replace(/ك/g,"ک").toLowerCase()}
+  function conv(raw){
+    var fa=$("lang").value==="fa-IR",cmds=fa?CMD_FA:CMD_EN,ws=String(raw).trim().split(/\s+/),out="",ns=false,i=0,CLOSE=",.;:!?،؛؟…)»";
+    while(i<ws.length){
+      var hit=null;
+      for(var c=0;c<cmds.length&&!hit;c++){
+        var p=cmds[c][0].split(" "),ok=i+p.length<=ws.length;
+        for(var j=0;ok&&j<p.length;j++)if(nw(ws[i+j])!==p[j])ok=false;
+        if(ok)hit=[cmds[c][1],p.length];
+      }
+      if(hit){
+        var s=hit[0];
+        if(s==="\n"){out=out.replace(/ +$/,"")+"\n";ns=true}
+        else if(CLOSE.indexOf(s)>-1){out=out.replace(/ +$/,"")+s;ns=false}
+        else if(s==="("||s==="«"){out+=(out&&!ns?" ":"")+s;ns=true}
+        else{out+=(out&&!ns?" ":"")+s;ns=false}
+        i+=hit[1];
+      }else{out+=(out&&!ns?" ":"")+ws[i];ns=false;i++}
+    }
+    return out;
+  }
+  function lock(){try{if(navigator.wakeLock)navigator.wakeLock.request("screen").then(function(l){wl=l},function(){})}catch(e){}}
+  function unlock(){try{if(wl){wl.release();wl=null}}catch(e){}}
+  document.addEventListener("visibilitychange",function(){if(on&&document.visibilityState==="visible")lock()});
+  function ui(){var m=$("mic");m.setAttribute("aria-pressed",on?"true":"false");m.textContent=on?"توقف":"شروع ضبط"}
+
+  var silT=null,lastActivity=0,started=false,base="",sesFin=[],tail="",skip=0;
+  function norm1(s){return nw(String(s)).replace(/\s+/g," ").trim()}
+  function merge(arr){
+    var out=[];
+    arr.forEach(function(s){
+      var n=norm1(s);if(!n)return;
+      var l=out.length?norm1(out[out.length-1]):"";
+      if(l&&n.indexOf(l)===0){out[out.length-1]=s}
+      else if(l&&l.indexOf(n)===0){}
+      else out.push(s);
+    });
+    return out.join(" ");
+  }
+  function joinBase(b,add){
+    if(!add.trim())return b;
+    var sep=(!b||/[\s(«]$/.test(b)||/^[,.;:!?،؛؟…)»\n]/.test(add))?"":" ";
+    return b+sep+add;
+  }
+  function render(){
+    t.value=joinBase(base,conv(merge(sesFin)));
+    store(t.value);t.scrollTop=t.scrollHeight;
+    $("interim").textContent=tail||"در حال گوش دادن…";
+  }
+  function rebase(){if(on){skip+=sesFin.length;sesFin=[];base=t.value}}
+  function mk(){
+    base=t.value;sesFin=[];tail="";skip=0;
+    var r=new SR();r.lang=$("lang").value;r.continuous=true;r.interimResults=true;
+    r.onstart=function(){started=true;say("میکروفون روشن است؛ بخوانید.")};
+    r.onspeechstart=function(){lastActivity=Date.now()};
+    r.onresult=function(e){
+      if(r!==rec)return;
+      fails=0;lastActivity=Date.now();
+      var fin=[],ia=[];
+      for(var i=0;i<e.results.length;i++){
+        var q=e.results[i];
+        if(q.isFinal)fin.push(q[0].transcript);else ia.push(q[0].transcript);
+      }
+      sesFin=fin.slice(skip);tail=merge(ia);lastInterim=tail;
+      var interim=tail;
+      render();
+      $("interim").textContent=interim||"در حال گوش دادن…";
+    };
+    r.onerror=function(e){
+      if(e.error==="not-allowed"||e.error==="service-not-allowed"){
+        on=false;unlock();clearInterval(silT);ui();
+        say("دسترسی به میکروفون داده نشد. اجازهٔ میکروفون را در مرورگر بدهید. اگر اپ داخل Claude باز شده، ممکن است میکروفون آنجا مسدود باشد؛ در این حالت از میکروفون کیبورد گوشی استفاده کنید.");
+      }else if(e.error==="network"){say("تشخیص صدا به اینترنت نیاز دارد؛ اتصال گوشی را بررسی کنید.")}
+      else if(e.error==="audio-capture"){say("میکروفونی پیدا نشد یا توسط برنامهٔ دیگری استفاده می‌شود.")}
+      else if(e.error!=="no-speech"&&e.error!=="aborted"){say("خطا در تشخیص صدا: "+e.error)}
+    };
+    r.onend=function(){
+      if(r!==rec)return;
+      if(tail.trim()){sesFin.push(tail);tail="";lastInterim="";render()}
+      if(!on){$("interim").textContent="";ui();return}
+      if(Date.now()-startedAt<800)fails=Math.min(fails+1,20);else fails=0;
+      if(false){stop();say("تشخیص صدا پیوسته قطع می‌شود. دوباره ضبط را شروع کنید یا از میکروفون کیبورد گوشی استفاده کنید.");return}
+      setTimeout(function(){go(0)},Math.min(100+fails*150,1500));
+    };
+    return r;
+  }
+  function go(tries){
+    if(!on)return;
+    rec=mk();startedAt=Date.now();
+    try{rec.start()}catch(x){
+      if(tries<8)setTimeout(function(){go(tries+1)},300);
+      else{stop();say("ادامهٔ ضبط ممکن نشد. دوباره شروع کنید.")}
+    }
+  }
+  function start(){
+    if(!SR){say("مرورگر این گوشی تایپ با صدا را پشتیبانی نمی‌کند. می‌توانید از دکمهٔ میکروفون روی کیبورد گوشی داخل کادر متن استفاده کنید.");return}
+    if(window.isSecureContext===false){say("این صفحه با آدرس امن (https) باز نشده، پس مرورگر اجازهٔ میکروفون نمی‌دهد. صفحه را از آدرس https باز کنید، نه از فایل ذخیره‌شده روی گوشی.");return}
+    started=false;on=true;fails=0;lastInterim="";lastActivity=Date.now()+7000;lock();
+    $("interim").textContent="در حال گوش دادن…";say("");
+    ui();go(0);
+    say("در حال روشن‌کردن میکروفون… اگر مرورگر اجازه خواست، «اجازه دادن» را بزنید.");
+    setTimeout(function(){if(on&&!started)say("میکروفون روشن نشد. اجازهٔ میکروفون را در تنظیمات مرورگر بررسی کنید یا صفحه را در Chrome باز کنید.")},4000);
+    clearInterval(silT);
+    silT=setInterval(function(){
+      var lim=0;
+      if(on&&lim>0&&Date.now()-lastActivity>lim*1000){stop();say("ضبط به‌دلیل "+lim+" ثانیه سکوت متوقف شد.")}
+    },500);
+  }
+  function stop(){on=false;unlock();clearInterval(silT);try{rec&&rec.stop()}catch(x){}$("interim").textContent="";ui()}
+  $("mic").addEventListener("click",function(){on?stop():start()});
+
+  document.querySelector(".row[aria-label]").addEventListener("click",function(e){
+    var b=e.target.closest("[data-i]");if(!b)return;
+    var s=b.getAttribute("data-i"),a=t.selectionStart,z=t.selectionEnd;
+    t.value=t.value.slice(0,a)+s+t.value.slice(z);
+    t.selectionStart=t.selectionEnd=a+s.length;store(t.value);rebase();
+  });
+
+  $("copy").addEventListener("click",function(){
+    var done=function(){say("متن کپی شد.")};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t.value).then(done,function(){t.select();say("کپی خودکار انجام نشد؛ متن انتخاب شد، دستی کپی کنید.")})}
+    else{t.select();try{document.execCommand("copy");done()}catch(e){say("متن انتخاب شد، دستی کپی کنید.")}}
+  });
+  $("clear").addEventListener("click",function(){
+    if(!t.value)return;
+    backup=t.value;t.value="";store("");rebase();$("undo").hidden=false;say("متن پاک شد.");
+  });
+  $("undo").addEventListener("click",function(){t.value=backup;store(t.value);rebase();$("undo").hidden=true;say("متن برگردانده شد.")});
+
+  /* ---- Word (docx) file, built without any library ---- */
+  var CT=(function(){var a=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;a[n]=c>>>0}return a})();
+  function crc(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CT[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+  function zip(files){
+    var enc=new TextEncoder(),chunks=[],cen=[],off=0,cs=0;
+    files.forEach(function(f){
+      var nm=enc.encode(f.name),d=enc.encode(f.text),c=crc(d);
+      var h=new DataView(new ArrayBuffer(30));
+      h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(12,0x21,true);
+      h.setUint32(14,c,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nm.length,true);
+      chunks.push(new Uint8Array(h.buffer),nm,d);
+      var e=new DataView(new ArrayBuffer(46));
+      e.setUint32(0,0x02014b50,true);e.setUint16(4,20,true);e.setUint16(6,20,true);e.setUint16(8,0x0800,true);e.setUint16(14,0x21,true);
+      e.setUint32(16,c,true);e.setUint32(20,d.length,true);e.setUint32(24,d.length,true);e.setUint16(28,nm.length,true);e.setUint32(42,off,true);
+      cen.push(new Uint8Array(e.buffer),nm);
+      off+=30+nm.length+d.length;cs+=46+nm.length;
+    });
+    var z=new DataView(new ArrayBuffer(22));
+    z.setUint32(0,0x06054b50,true);z.setUint16(8,files.length,true);z.setUint16(10,files.length,true);z.setUint32(12,cs,true);z.setUint32(16,off,true);
+    return new Blob(chunks.concat(cen,[new Uint8Array(z.buffer)]),{type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+  }
+  function x(s){return s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+  function docx(text,rtl){
+    var W="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+    var rpr='<w:rPr><w:rFonts w:ascii="Tahoma" w:hAnsi="Tahoma" w:cs="Tahoma"/><w:sz w:val="28"/><w:szCs w:val="28"/>'+(rtl?'<w:rtl/><w:lang w:bidi="fa-IR"/>':'<w:lang w:val="en-US"/>')+'</w:rPr>';
+    var body=text.replace(/\r\n?/g,"\n").split("\n").map(function(l){
+      return '<w:p><w:pPr>'+(rtl?'<w:bidi/>':'')+'<w:spacing w:after="160" w:line="360" w:lineRule="auto"/></w:pPr><w:r>'+rpr+'<w:t xml:space="preserve">'+x(l)+'</w:t></w:r></w:p>';
+    }).join("");
+    return zip([
+      {name:"[Content_Types].xml",text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'},
+      {name:"_rels/.rels",text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'},
+      {name:"word/document.xml",text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="'+W+'"><w:body>'+body+'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>'+(rtl?'<w:bidi/>':'')+'</w:sectPr></w:body></w:document>'}
+    ]);
+  }
+  $("save").addEventListener("click",async function(){
+    if(!t.value.trim()){say("ابتدا متنی بنویسید یا ضبط کنید.");return}
+    var btn=this,name="dictation-"+new Date().toISOString().slice(0,10)+".docx";
+    btn.disabled=true;
+    try{
+      var blob=docx(t.value,$("lang").value==="fa-IR"),dl=null;
+      try{dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null}catch(e){}
+      if(dl){await dl.save({filename:name,data:blob});say("فایل Word ذخیره شد.")}
+      else{
+        var u=URL.createObjectURL(blob),a=document.createElement("a");
+        a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
+        setTimeout(function(){URL.revokeObjectURL(u)},4000);say("فایل Word دانلود شد.");
+      }
+    }catch(e){say(e&&e.code==="declined"?"":"ذخیرهٔ فایل انجام نشد.")}
+    btn.disabled=false;
+  });
+})();
+</script>
+</body>
+</html>
